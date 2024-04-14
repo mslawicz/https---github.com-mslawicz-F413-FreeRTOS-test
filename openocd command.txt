@@ -1,2 +1,1 @@
 openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c "program C:/Users/marci/Documents/workspace/F413-freertos-test/build/F413-freertos-test.elf verify reset exit"
-github token: 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

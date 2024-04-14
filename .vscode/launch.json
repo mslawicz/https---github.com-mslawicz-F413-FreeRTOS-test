@@ -14,7 +14,8 @@
             "searchDir": [],
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none",
-            "device": "STM32F413ZH"
+            "device": "STM32F413ZH",
+            "svdFile": "./STM32F413.svd"
         }
     ],
     "version": "2.0.0"

@@ -57,7 +57,19 @@ osThreadId_t LED_toggleHandle;
 const osThreadAttr_t LED_toggle_attributes = {
   .name = "LED_toggle",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for LED_trigger */
+osThreadId_t LED_triggerHandle;
+const osThreadAttr_t LED_trigger_attributes = {
+  .name = "LED_trigger",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
+};
+/* Definitions for LED_Timer */
+osTimerId_t LED_TimerHandle;
+const osTimerAttr_t LED_Timer_attributes = {
+  .name = "LED_Timer"
 };
 /* USER CODE BEGIN PV */
 
@@ -70,6 +82,8 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 void StartDefaultTask(void *argument);
 void StartLedToggle(void *argument);
+void StartLedTrigger(void *argument);
+void LedOffCbk(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -125,6 +139,10 @@ int main(void)
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of LED_Timer */
+  LED_TimerHandle = osTimerNew(LedOffCbk, osTimerOnce, NULL, &LED_Timer_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
@@ -139,6 +157,9 @@ int main(void)
 
   /* creation of LED_toggle */
   LED_toggleHandle = osThreadNew(StartLedToggle, NULL, &LED_toggle_attributes);
+
+  /* creation of LED_trigger */
+  LED_triggerHandle = osThreadNew(StartLedTrigger, NULL, &LED_trigger_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -372,6 +393,33 @@ void StartLedToggle(void *argument)
     osDelay(200);
   }
   /* USER CODE END StartLedToggle */
+}
+
+/* USER CODE BEGIN Header_StartLedTrigger */
+/**
+* @brief Function implementing the LED_trigger thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLedTrigger */
+void StartLedTrigger(void *argument)
+{
+  /* USER CODE BEGIN StartLedTrigger */
+  /* Infinite loop */
+  for(;;)
+  {
+    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD2_Pin);
+    osDelay(500);
+  }
+  /* USER CODE END StartLedTrigger */
+}
+
+/* LedOffCbk function */
+void LedOffCbk(void *argument)
+{
+  /* USER CODE BEGIN LedOffCbk */
+
+  /* USER CODE END LedOffCbk */
 }
 
 /**

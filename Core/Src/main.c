@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-/* add my private includes here */
+#include "my_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -405,13 +405,7 @@ void StartLedToggle(void *argument)
 void StartLedTrigger(void *argument)
 {
   /* USER CODE BEGIN StartLedTrigger */
-  /* Infinite loop */
-  for(;;)
-  {
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-    osTimerStart(LED_TimerHandle, 100);
-    osDelay(1000);
-  }
+  LedTrigger(LED_TimerHandle);
   /* USER CODE END StartLedTrigger */
 }
 

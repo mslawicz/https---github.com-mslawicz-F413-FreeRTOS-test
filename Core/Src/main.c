@@ -390,7 +390,7 @@ void StartLedToggle(void *argument)
   for(;;)
   {
     HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-    osDelay(200);
+    osDelay(1000);
   }
   /* USER CODE END StartLedToggle */
 }
@@ -408,8 +408,9 @@ void StartLedTrigger(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD2_Pin);
-    osDelay(500);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+    osTimerStart(LED_TimerHandle, 100);
+    osDelay(1000);
   }
   /* USER CODE END StartLedTrigger */
 }
@@ -418,7 +419,7 @@ void StartLedTrigger(void *argument)
 void LedOffCbk(void *argument)
 {
   /* USER CODE BEGIN LedOffCbk */
-
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
   /* USER CODE END LedOffCbk */
 }
 

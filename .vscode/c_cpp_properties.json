@@ -15,8 +15,10 @@
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\13.2 Rel1\\bin\\arm-none-eabi-gcc.exe",
             "compilerArgs": [
+                "-mthumb",
                 "-mcpu=cortex-m4",
-                "-mthumb"
+                "-mfloat-abi=softfp",
+                "-mfpu=fpv4-sp-d16"                
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",

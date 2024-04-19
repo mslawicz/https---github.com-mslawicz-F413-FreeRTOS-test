@@ -2,7 +2,7 @@
     "configurations": [
         {
             "cwd": "${workspaceRoot}",
-            "executable": "./build/F413-freertos-test.elf",
+            "executable": "./cmake_build/F413-cm-test.elf",
             "name": "Debug with OpenOCD",
             "request": "launch",
             "type": "cortex-debug",
@@ -13,7 +13,7 @@
             ],
             "searchDir": [],
             "runToEntryPoint": "main",
-            "showDevDebugOutput": "none",
+            "showDevDebugOutput": "raw",
             "device": "STM32F413ZH",
             "svdFile": "./STM32F413.svd"
         }

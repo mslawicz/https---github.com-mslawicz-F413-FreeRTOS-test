@@ -1,6 +1,7 @@
 {
     "cmake.configureOnOpen": false,
     "files.associations": {
-        "main.h": "c"
+        "main.h": "c",
+        "stm32f4xx.h": "c"
     }
 }

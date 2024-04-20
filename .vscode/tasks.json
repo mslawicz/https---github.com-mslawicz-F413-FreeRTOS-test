@@ -4,11 +4,8 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "make",
-            "args": [
-                "-j24",
-                "all"
-            ],
+            "command": "./build.bat",
+            "args": [],
             "options": {
                 "cwd": "${workspaceRoot}"
             },

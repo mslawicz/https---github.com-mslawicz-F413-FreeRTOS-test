@@ -57,19 +57,19 @@ osThreadId_t LED_toggleHandle;
 const osThreadAttr_t LED_toggle_attributes = {
   .name = "LED_toggle",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal5,
 };
 /* Definitions for LED_trigger */
 osThreadId_t LED_triggerHandle;
 const osThreadAttr_t LED_trigger_attributes = {
   .name = "LED_trigger",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityNormal5,
 };
-/* Definitions for LED_Timer */
-osTimerId_t LED_TimerHandle;
-const osTimerAttr_t LED_Timer_attributes = {
-  .name = "LED_Timer"
+/* Definitions for LedMutex */
+osMutexId_t LedMutexHandle;
+const osMutexAttr_t LedMutex_attributes = {
+  .name = "LedMutex"
 };
 /* USER CODE BEGIN PV */
 
@@ -83,7 +83,6 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 void StartDefaultTask(void *argument);
 void StartLedToggle(void *argument);
 void StartLedTrigger(void *argument);
-void LedOffCbk(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -130,6 +129,9 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
+  /* Create the mutex(es) */
+  /* creation of LedMutex */
+  LedMutexHandle = osMutexNew(&LedMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -138,10 +140,6 @@ int main(void)
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
-
-  /* Create the timer(s) */
-  /* creation of LED_Timer */
-  LED_TimerHandle = osTimerNew(LedOffCbk, osTimerOnce, NULL, &LED_Timer_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -389,8 +387,11 @@ void StartLedToggle(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-    osDelay(1000);
+    osMutexWait(LedMutexHandle, osWaitForever);
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
+    osDelay(100);
+    osMutexRelease(LedMutexHandle);
+    osDelay(10);
   }
   /* USER CODE END StartLedToggle */
 }
@@ -405,16 +406,16 @@ void StartLedToggle(void *argument)
 void StartLedTrigger(void *argument)
 {
   /* USER CODE BEGIN StartLedTrigger */
-  LedTrigger(LED_TimerHandle);
+  /* Infinite loop */
+  for(;;)
+  {
+    osMutexWait(LedMutexHandle, osWaitForever);
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
+    osDelay(900);
+    osMutexRelease(LedMutexHandle);
+    osDelay(10);
+  }
   /* USER CODE END StartLedTrigger */
-}
-
-/* LedOffCbk function */
-void LedOffCbk(void *argument)
-{
-  /* USER CODE BEGIN LedOffCbk */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-  /* USER CODE END LedOffCbk */
 }
 
 /**

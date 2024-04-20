@@ -6,6 +6,6 @@ void LedTrigger(osTimerId_t timerHandle)
     {
         HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
         osTimerStart(timerHandle, 50);
-        osDelay(3333);
+        osDelay(2000);
     }
 }

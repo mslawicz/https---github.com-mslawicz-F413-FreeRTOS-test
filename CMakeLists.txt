@@ -9,7 +9,7 @@ set(CMAKE_C_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_ASM_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_CXX_COMPILER ${TRIPLET}-g++)
 set(OBJCOPY ${TRIPLET}-objcopy)
-set(CMAKE_C_FLAGS_INIT "-fdata-sections -ffunction-sections --specs=nano.specs --specs=nosys.specs -Wl,--gc-sections")
+set(CMAKE_C_FLAGS_INIT "-fdata-sections -ffunction-sections -specs=nano.specs -Wl,--gc-sections")
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
@@ -46,9 +46,9 @@ add_link_options(
     -specs=nano.specs
     -lc 
     -lm 
-    -lnosys
     -Wl,-Map=${TARGET}.map,--cref
     -Wl,--gc-sections
+    -Wl,--no-warn-rwx-segment
 )
 
 add_executable(

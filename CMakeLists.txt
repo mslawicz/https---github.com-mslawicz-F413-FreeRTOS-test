@@ -8,8 +8,9 @@ set(TRIPLET arm-none-eabi)
 set(CMAKE_C_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_ASM_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_CXX_COMPILER ${TRIPLET}-g++)
+set(OBJCOPY ${TRIPLET}-objcopy)
 set(CMAKE_C_FLAGS_INIT "-fdata-sections -ffunction-sections --specs=nano.specs --specs=nosys.specs -Wl,--gc-sections")
-set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections")
+set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
 SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
@@ -51,7 +52,7 @@ add_link_options(
 )
 
 add_executable(
-    F413-cm-test
+    ${TARGET}
     Core/Src/main.c
     Core/Src/freertos.c
     Core/Src/stm32f4xx_it.c
@@ -77,7 +78,6 @@ add_executable(
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c
-    Core/Src/system_stm32f4xx.c
     Middlewares/Third_Party/FreeRTOS/Source/croutine.c
     Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
     Middlewares/Third_Party/FreeRTOS/Source/list.c
@@ -88,7 +88,6 @@ add_executable(
     Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c
     Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
     Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
-    startup_stm32f413xx.s 
 )
 
 include_directories(
@@ -100,4 +99,25 @@ include_directories(
     Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     Drivers/CMSIS/Device/ST/STM32F4xx/Include
     Drivers/CMSIS/Include
+)
+
+add_library(
+    CMSIS
+    Core/Src/system_stm32f4xx.c
+)
+
+add_library(
+    STARTUP
+    startup_stm32f413xx.s
+)
+
+target_link_libraries(${TARGET} CMSIS STARTUP)
+
+set(HEX "${OBJCOPY} -O ihex")
+set(BIN "${OBJCOPY} -O binary -S")
+
+add_custom_command(
+    TARGET ${TARGET} POST_BUILD
+    COMMAND ${OBJCOPY} ARGS -O ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
+    COMMAND ${OBJCOPY} ARGS -O binary -S $<TARGET_FILE:${TARGET}> ${TARGET}.bin
 )

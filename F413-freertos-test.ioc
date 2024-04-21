@@ -2,10 +2,11 @@
 CAD.formats=
 CAD.pinconfig=
 CAD.provider=
-FREERTOS.Events01=LedEvents,Dynamic,NULL
+FREERTOS.Events01=
 FREERTOS.FootprintOK=true
 FREERTOS.INCLUDE_xEventGroupSetBitFromISR=1
-FREERTOS.IPParameters=Tasks01,INCLUDE_xEventGroupSetBitFromISR,Events01,FootprintOK
+FREERTOS.IPParameters=Tasks01,INCLUDE_xEventGroupSetBitFromISR,Events01,FootprintOK,Queues01
+FREERTOS.Queues01=LedQueue,8,uint8_t,0,Dynamic,NULL,NULL
 FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;LedTrigger,29,128,LedTriggerStart,Default,NULL,Dynamic,NULL,NULL;LedToggle,29,128,LedToggleStart,Default,NULL,Dynamic,NULL,NULL
 File.Version=6
 KeepUserPlacement=false

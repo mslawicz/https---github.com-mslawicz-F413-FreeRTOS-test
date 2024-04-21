@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define LED_FLAG  0x00000001
+#define FLASH_SIZE 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -67,10 +67,10 @@ const osThreadAttr_t LedToggle_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
-/* Definitions for LedEvents */
-osEventFlagsId_t LedEventsHandle;
-const osEventFlagsAttr_t LedEvents_attributes = {
-  .name = "LedEvents"
+/* Definitions for LedQueue */
+osMessageQueueId_t LedQueueHandle;
+const osMessageQueueAttr_t LedQueue_attributes = {
+  .name = "LedQueue"
 };
 /* USER CODE BEGIN PV */
 
@@ -143,6 +143,10 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of LedQueue */
+  LedQueueHandle = osMessageQueueNew (8, sizeof(uint8_t), &LedQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -160,10 +164,6 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
-
-  /* Create the event(s) */
-  /* creation of LedEvents */
-  LedEventsHandle = osEventFlagsNew(&LedEvents_attributes);
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
@@ -387,10 +387,15 @@ void LedTriggerStart(void *argument)
 {
   /* USER CODE BEGIN LedTriggerStart */
   /* Infinite loop */
+  uint8_t flashes;
+  const uint8_t flashTab[FLASH_SIZE] = {1,5,3,4,2,7,3,6};
+  static uint8_t currentFlash = 0;
   for(;;)
   {
-    osThreadFlagsSet(LedToggleHandle, LED_FLAG);
-    osDelay(500);
+    flashes = flashTab[currentFlash];
+    currentFlash = (currentFlash + 1) % FLASH_SIZE;
+    osMessageQueuePut(LedQueueHandle, &flashes, 0, 0);
+    osDelay(2000);
   }
   /* USER CODE END LedTriggerStart */
 }
@@ -406,10 +411,18 @@ void LedToggleStart(void *argument)
 {
   /* USER CODE BEGIN LedToggleStart */
   /* Infinite loop */
+  uint8_t flashes;
+  uint8_t fl;
   for(;;)
   {
-    osThreadFlagsWait(LED_FLAG, osFlagsWaitAny, osWaitForever);
-    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD2_Pin);
+    osMessageQueueGet(LedQueueHandle, &flashes, 0, osWaitForever);
+    for(fl = 0; fl < flashes; fl++)
+    {
+      HAL_GPIO_WritePin(LD1_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+      osDelay(100);
+      HAL_GPIO_WritePin(LD1_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+      osDelay(100);
+    }
   }
   /* USER CODE END LedToggleStart */
 }

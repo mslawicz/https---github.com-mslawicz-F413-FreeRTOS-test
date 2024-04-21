@@ -22,6 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "cmsis_os2.h"
 #include "my_timer.h"
 /* USER CODE END Includes */
 
@@ -32,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define LED_FLAG  0x00000001
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,24 +53,24 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for LED_toggle */
-osThreadId_t LED_toggleHandle;
-const osThreadAttr_t LED_toggle_attributes = {
-  .name = "LED_toggle",
+/* Definitions for LedTrigger */
+osThreadId_t LedTriggerHandle;
+const osThreadAttr_t LedTrigger_attributes = {
+  .name = "LedTrigger",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
-/* Definitions for LED_trigger */
-osThreadId_t LED_triggerHandle;
-const osThreadAttr_t LED_trigger_attributes = {
-  .name = "LED_trigger",
+/* Definitions for LedToggle */
+osThreadId_t LedToggleHandle;
+const osThreadAttr_t LedToggle_attributes = {
+  .name = "LedToggle",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
-/* Definitions for LedMutex */
-osMutexId_t LedMutexHandle;
-const osMutexAttr_t LedMutex_attributes = {
-  .name = "LedMutex"
+/* Definitions for LedEvents */
+osEventFlagsId_t LedEventsHandle;
+const osEventFlagsAttr_t LedEvents_attributes = {
+  .name = "LedEvents"
 };
 /* USER CODE BEGIN PV */
 
@@ -81,8 +82,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 void StartDefaultTask(void *argument);
-void StartLedToggle(void *argument);
-void StartLedTrigger(void *argument);
+void LedTriggerStart(void *argument);
+void LedToggleStart(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -129,9 +130,6 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
-  /* Create the mutex(es) */
-  /* creation of LedMutex */
-  LedMutexHandle = osMutexNew(&LedMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -153,15 +151,19 @@ int main(void)
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of LED_toggle */
-  LED_toggleHandle = osThreadNew(StartLedToggle, NULL, &LED_toggle_attributes);
+  /* creation of LedTrigger */
+  LedTriggerHandle = osThreadNew(LedTriggerStart, NULL, &LedTrigger_attributes);
 
-  /* creation of LED_trigger */
-  LED_triggerHandle = osThreadNew(StartLedTrigger, NULL, &LED_trigger_attributes);
+  /* creation of LedToggle */
+  LedToggleHandle = osThreadNew(LedToggleStart, NULL, &LedToggle_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* Create the event(s) */
+  /* creation of LedEvents */
+  LedEventsHandle = osEventFlagsNew(&LedEvents_attributes);
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
@@ -374,48 +376,42 @@ void StartDefaultTask(void *argument)
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_StartLedToggle */
+/* USER CODE BEGIN Header_LedTriggerStart */
 /**
-* @brief Function implementing the LED_toggle thread.
+* @brief Function implementing the LedTrigger thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartLedToggle */
-void StartLedToggle(void *argument)
+/* USER CODE END Header_LedTriggerStart */
+void LedTriggerStart(void *argument)
 {
-  /* USER CODE BEGIN StartLedToggle */
+  /* USER CODE BEGIN LedTriggerStart */
   /* Infinite loop */
   for(;;)
   {
-    osMutexWait(LedMutexHandle, osWaitForever);
-    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
-    osDelay(100);
-    osMutexRelease(LedMutexHandle);
-    osDelay(10);
+    osEventFlagsSet(LedEventsHandle, LED_FLAG);
+    osDelay(500);
   }
-  /* USER CODE END StartLedToggle */
+  /* USER CODE END LedTriggerStart */
 }
 
-/* USER CODE BEGIN Header_StartLedTrigger */
+/* USER CODE BEGIN Header_LedToggleStart */
 /**
-* @brief Function implementing the LED_trigger thread.
+* @brief Function implementing the LedToggle thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartLedTrigger */
-void StartLedTrigger(void *argument)
+/* USER CODE END Header_LedToggleStart */
+void LedToggleStart(void *argument)
 {
-  /* USER CODE BEGIN StartLedTrigger */
+  /* USER CODE BEGIN LedToggleStart */
   /* Infinite loop */
   for(;;)
   {
-    osMutexWait(LedMutexHandle, osWaitForever);
-    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
-    osDelay(900);
-    osMutexRelease(LedMutexHandle);
-    osDelay(10);
+    osEventFlagsWait(LedEventsHandle, LED_FLAG, osFlagsWaitAny, osWaitForever);
+    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
   }
-  /* USER CODE END StartLedTrigger */
+  /* USER CODE END LedToggleStart */
 }
 
 /**

@@ -2,11 +2,11 @@
 CAD.formats=
 CAD.pinconfig=
 CAD.provider=
+FREERTOS.Events01=LedEvents,Dynamic,NULL
 FREERTOS.FootprintOK=true
-FREERTOS.IPParameters=Tasks01,configUSE_NEWLIB_REENTRANT,FootprintOK,Mutexes01
-FREERTOS.Mutexes01=LedMutex,Dynamic,NULL
-FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;LED_toggle,29,128,StartLedToggle,Default,NULL,Dynamic,NULL,NULL;LED_trigger,29,128,StartLedTrigger,Default,NULL,Dynamic,NULL,NULL
-FREERTOS.configUSE_NEWLIB_REENTRANT=1
+FREERTOS.INCLUDE_xEventGroupSetBitFromISR=1
+FREERTOS.IPParameters=Tasks01,INCLUDE_xEventGroupSetBitFromISR,Events01,FootprintOK
+FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;LedTrigger,29,128,LedTriggerStart,Default,NULL,Dynamic,NULL,NULL;LedToggle,29,128,LedToggleStart,Default,NULL,Dynamic,NULL,NULL
 File.Version=6
 KeepUserPlacement=false
 Mcu.CPN=STM32F413ZHT3

@@ -389,7 +389,7 @@ void LedTriggerStart(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osEventFlagsSet(LedEventsHandle, LED_FLAG);
+    osThreadFlagsSet(LedToggleHandle, LED_FLAG);
     osDelay(500);
   }
   /* USER CODE END LedTriggerStart */
@@ -408,8 +408,8 @@ void LedToggleStart(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osEventFlagsWait(LedEventsHandle, LED_FLAG, osFlagsWaitAny, osWaitForever);
-    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+    osThreadFlagsWait(LED_FLAG, osFlagsWaitAny, osWaitForever);
+    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD2_Pin);
   }
   /* USER CODE END LedToggleStart */
 }

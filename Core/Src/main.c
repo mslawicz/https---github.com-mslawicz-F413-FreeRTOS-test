@@ -158,6 +158,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  pLedToggleHandle = &LedToggleHandle;
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -245,7 +246,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 1465-1;
+  htim3.Init.Prescaler = 500;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 65535;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -465,7 +466,8 @@ void LedToggleStart(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(100);
+    osThreadFlagsWait(LED_INT_EVENT, osFlagsWaitAll, osWaitForever);
+    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
   }
   /* USER CODE END LedToggleStart */
 }

@@ -1,11 +1,9 @@
 #include "my_timer.h"
 
-void LedTrigger(osTimerId_t timerHandle)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    for(;;)
+    if(GPIO_Pin == LED_Int_Pin)
     {
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-        osTimerStart(timerHandle, 50);
-        osDelay(2000);
+        HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
     }
 }

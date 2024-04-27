@@ -7,5 +7,6 @@
 #define INJECT_EVENT    1
 
 extern osThreadId_t* pInjectTask;
+extern TIM_HandleTypeDef* pEncoderTIM;
 
 #endif /* __MY_TIMER_H */

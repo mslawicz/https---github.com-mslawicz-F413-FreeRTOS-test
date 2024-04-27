@@ -71,11 +71,6 @@ const osThreadAttr_t LedToggle_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
-/* Definitions for injectTimer */
-osTimerId_t injectTimerHandle;
-const osTimerAttr_t injectTimer_attributes = {
-  .name = "injectTimer"
-};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -91,7 +86,6 @@ static void MX_TIM1_Init(void);
 void StartDefaultTask(void *argument);
 void LedTriggerStart(void *argument);
 void LedToggleStart(void *argument);
-void stopInjecting(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -152,10 +146,6 @@ int main(void)
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
-
-  /* Create the timer(s) */
-  /* creation of injectTimer */
-  injectTimerHandle = osTimerNew(stopInjecting, osTimerOnce, NULL, &injectTimer_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -608,17 +598,29 @@ void LedTriggerStart(void *argument)
   /* nominal injecting encoder positions for cylinders */
   const uint16_t nominalInjPos[NUMB_OF_CYLINDERS] = {64, 192, 320, 448, 576, 704, 832, 960};
   uint8_t currentCylinder = 0;
+  uint8_t injectionOn = 0;
   /* Infinite loop */
   for(;;)
   {
     /* wait for flag from encoder interrupt */
     osThreadFlagsWait(INJECT_EVENT, osFlagsWaitAny, osWaitForever);
-    HAL_GPIO_WritePin(TEST_GPIO_Port, TEST_Pin, GPIO_PIN_SET);
-    /* the next injection point is slightly randomized */
-    htim1.Instance->CCR1 = nominalInjPos[currentCylinder] + (SysTick->VAL) % 30;
-    /* injection will be turned off after 5 ms */
-    osTimerStart(injectTimerHandle, 5);
-    currentCylinder = (currentCylinder + 1) % NUMB_OF_CYLINDERS;
+    
+    if(injectionOn == 0)
+    {
+      HAL_GPIO_WritePin(TEST_GPIO_Port, TEST_Pin, GPIO_PIN_SET);
+      /* set the injection off encoder point */
+      /* here the injection duration is set to 3 encoder pulses */
+      htim1.Instance->CCR1 = (htim1.Instance->CCR1 + 3) % (htim1.Init.Period + 1);
+      injectionOn = 1;
+    }
+    else
+    {
+      HAL_GPIO_WritePin(TEST_GPIO_Port, TEST_Pin, GPIO_PIN_RESET);
+      injectionOn = 0;
+      /* the next injection point is slightly randomized */
+      htim1.Instance->CCR1 = nominalInjPos[currentCylinder] + (SysTick->VAL) % 30;
+      currentCylinder = (currentCylinder + 1) % NUMB_OF_CYLINDERS;
+    }
   }
   /* USER CODE END LedTriggerStart */
 }
@@ -639,15 +641,6 @@ void LedToggleStart(void *argument)
     osDelay(2000);
   }
   /* USER CODE END LedToggleStart */
-}
-
-/* stopInjecting function */
-void stopInjecting(void *argument)
-{
-  /* USER CODE BEGIN stopInjecting */
-  /* this timer function should turn off all injectors */
-  HAL_GPIO_WritePin(TEST_GPIO_Port, TEST_Pin, GPIO_PIN_RESET);
-  /* USER CODE END stopInjecting */
 }
 
 /**

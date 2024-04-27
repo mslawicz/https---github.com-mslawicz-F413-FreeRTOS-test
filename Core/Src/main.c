@@ -596,7 +596,7 @@ void LedTriggerStart(void *argument)
   /* USER CODE BEGIN LedTriggerStart */
 #define NUMB_OF_CYLINDERS  8
   /* nominal injecting encoder positions for cylinders */
-  const uint16_t nominalInjPos[NUMB_OF_CYLINDERS] = {64, 192, 320, 448, 576, 704, 832, 960};
+  const uint16_t nominalInjPos[NUMB_OF_CYLINDERS] = {24, 152, 280, 408, 536, 674, 792, 920};
   uint8_t currentCylinder = 0;
   uint8_t injectionOn = 0;
   /* Infinite loop */

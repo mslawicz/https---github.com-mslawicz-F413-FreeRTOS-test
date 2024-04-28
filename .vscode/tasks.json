@@ -10,7 +10,8 @@
                 "cwd": "${workspaceRoot}"
             },
             "group": {
-                "kind": "build"
+                "kind": "build",
+                "isDefault": true
             },
             "problemMatcher": []
         },

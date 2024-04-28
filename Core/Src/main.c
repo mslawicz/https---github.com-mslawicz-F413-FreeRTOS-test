@@ -606,10 +606,10 @@ void LedTriggerStart(void *argument)
   /* nominal trig encoder positions for cylinders and lubricators */
   static uint16_t trigPos[NUMB_OF_CYLINDERS][2][2] = {
     {{40, 42},{ 40, 42}},
-    {{210, 213},{ 211, 214}},
     {{380, 383},{ 382, 384}},
-    {{550, 553},{ 550, 553}},
     {{720, 723},{ 722, 724}},
+    {{210, 213},{ 211, 214}},
+    {{550, 553},{ 550, 553}},
     {{890, 892},{ 890, 892}}
   };
   uint8_t cylinder, lubricator;
@@ -624,13 +624,20 @@ void LedTriggerStart(void *argument)
     firstPos = 1024;
     for(cylinder = 0; cylinder < NUMB_OF_CYLINDERS; cylinder++)
     {
-      for(lubricator = 0; lubricator < 1; lubricator++)
+      for(lubricator = 0; lubricator < 2; lubricator++)
       {
         testPos = trigPos[cylinder][lubricator][0];
         if( currentPos == testPos)
         {
           /* start this lubricator */
-          HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+          if(lubricator == 0)
+          {
+            HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+          }
+          else
+          {
+            HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_SET);
+          }
         }
 
         if((testPos > currentPos) && (testPos < nextPos))
@@ -646,8 +653,15 @@ void LedTriggerStart(void *argument)
         if( currentPos == testPos)
         {
           /* stop this lubricator */
-          HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
-        }   
+          if(lubricator == 0)
+          {
+            HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
+          }
+          else
+          {
+            HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_RESET);
+          }
+        }
 
         if((testPos > currentPos) && (testPos < nextPos))
         {

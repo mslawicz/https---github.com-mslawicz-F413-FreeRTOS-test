@@ -602,32 +602,72 @@ void StartDefaultTask(void *argument)
 void LedTriggerStart(void *argument)
 {
   /* USER CODE BEGIN LedTriggerStart */
-#define NUMB_OF_CYLINDERS  8
-  /* nominal injecting encoder positions for cylinders */
-  const uint16_t nominalInjPos[NUMB_OF_CYLINDERS] = {24, 152, 280, 408, 536, 674, 792, 920};
-  uint8_t currentCylinder = 0;
-  uint8_t injectionOn = 0;
+#define NUMB_OF_CYLINDERS  6
+  /* nominal trig encoder positions for cylinders and lubricators */
+  static uint16_t trigPos[NUMB_OF_CYLINDERS][2][2] = {
+    {{40, 42},{ 40, 42}},
+    {{210, 213},{ 211, 214}},
+    {{380, 383},{ 382, 384}},
+    {{550, 553},{ 550, 553}},
+    {{720, 723},{ 722, 724}},
+    {{890, 892},{ 890, 892}}
+  };
+  uint8_t cylinder, lubricator;
+  uint16_t currentPos, nextPos, firstPos, testPos;
   /* Infinite loop */
   for(;;)
   {
     /* wait for flag from encoder interrupt */
     osThreadFlagsWait(INJECT_EVENT, osFlagsWaitAny, osWaitForever);
-    
-    if(injectionOn == 0)
+    currentPos = htim1.Instance->CCR1;
+    nextPos = 1024;
+    firstPos = 1024;
+    for(cylinder = 0; cylinder < NUMB_OF_CYLINDERS; cylinder++)
     {
-      HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
-      /* set the injection off encoder point */
-      /* here the injection duration is set to 3 encoder pulses */
-      htim1.Instance->CCR1 = (htim1.Instance->CCR1 + 3) % (htim1.Init.Period + 1);
-      injectionOn = 1;
-    }
-    else
-    {
-      HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
-      injectionOn = 0;
-      /* the next injection point is slightly randomized */
-      htim1.Instance->CCR1 = nominalInjPos[currentCylinder] + (SysTick->VAL) % 30;
-      currentCylinder = (currentCylinder + 1) % NUMB_OF_CYLINDERS;
+      for(lubricator = 0; lubricator < 1; lubricator++)
+      {
+        testPos = trigPos[cylinder][lubricator][0];
+        if( currentPos == testPos)
+        {
+          /* start this lubricator */
+          HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+        }
+
+        if((testPos > currentPos) && (testPos < nextPos))
+        {
+          nextPos = testPos;
+        }
+        if((testPos < currentPos) && (testPos < firstPos))
+        {
+          firstPos = testPos;
+        }        
+
+        testPos = trigPos[cylinder][lubricator][1];
+        if( currentPos == testPos)
+        {
+          /* stop this lubricator */
+          HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
+        }   
+
+        if((testPos > currentPos) && (testPos < nextPos))
+        {
+          nextPos = testPos;
+        }
+        if((testPos < currentPos) && (testPos < firstPos))
+        {
+          firstPos = testPos;
+        }         
+
+        /* set next position to trig */
+        if(nextPos < 1024)
+        {
+          htim1.Instance->CCR1 = nextPos;
+        }
+        else
+        {
+          htim1.Instance->CCR1 = firstPos;
+        }
+      }
     }
   }
   /* USER CODE END LedTriggerStart */

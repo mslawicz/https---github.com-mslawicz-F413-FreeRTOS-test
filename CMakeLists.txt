@@ -9,6 +9,7 @@ set(CMAKE_C_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_ASM_COMPILER ${TRIPLET}-gcc)
 set(CMAKE_CXX_COMPILER ${TRIPLET}-g++)
 set(OBJCOPY ${TRIPLET}-objcopy)
+set(CMAKE_SIZE ${TRIPLET}-size)
 set(CMAKE_C_FLAGS_INIT "-fdata-sections -ffunction-sections -specs=nano.specs -Wl,--gc-sections")
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
@@ -23,7 +24,6 @@ enable_language(C ASM)
 project(
     ${TARGET}
     VERSION 1.0
-    LANGUAGES C ASM
 )
 
 add_compile_options(
@@ -49,6 +49,7 @@ add_link_options(
     -Wl,-Map=${TARGET}.map,--cref
     -Wl,--gc-sections
     -Wl,--no-warn-rwx-segment
+    -Wl,--print-memory-usage
 )
 
 file(GLOB PROJECT_SOURCE_FILES CONFIGURE_DEPENDS Core/Src/*.c)
@@ -108,7 +109,16 @@ add_library(
     startup_stm32f413xx.s
 )
 
-target_link_libraries(${TARGET} CMSIS STARTUP)
+target_link_libraries(
+    ${TARGET}
+    CMSIS
+    STARTUP
+)
+
+# Execute post-build to print size
+add_custom_command(TARGET ${TARGET} POST_BUILD
+    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${TARGET}>
+)
 
 set(HEX "${OBJCOPY} -O ihex")
 set(BIN "${OBJCOPY} -O binary -S")

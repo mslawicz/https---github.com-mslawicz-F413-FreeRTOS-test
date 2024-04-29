@@ -3,30 +3,35 @@
     "tasks": [
         {
             "label": "build",
-            "type": "shell",
-            "command": "./build.bat",
-            "args": [],
+            "type": "cppbuild",
+            "command": "cmake",
+            "args": ["--build", "${command:cmake.buildDirectory}", "-j"],
             "options": {
-                "cwd": "${workspaceRoot}"
+                "cwd": "${workspaceFolder}"
             },
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "problemMatcher": ["$gcc"]
         },
         {
-            "label": "clean",
             "type": "shell",
-            "command": "make",
-            "args": [
-                "clean"
-            ],
+            "label": "rebuild project",
+            "command": "cmake",
+            "args": ["--build", "${command:cmake.buildDirectory}", "--clean-first", "-v", "-j"],
             "options": {
-                "cwd": "${workspaceRoot}"
+                "cwd": "${workspaceFolder}"
             },
-            "group": {
-                "kind": "build"
+            "problemMatcher": ["$gcc"],
+        },        
+        {
+            "label": "clean project",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "${command:cmake.buildDirectory}", "--target", "clean"],
+            "options": {
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": []
         },
@@ -34,20 +39,14 @@
             "label": "run",
             "type": "shell",
             "command": "STM32_Programmer_CLI",
-            "args": 
-            [
-                "-c port=SWD",
-                "-e all", 
-                "-d ./build/vsarm_firmware.bin 0x8000000",
-                "-v",
-                "-hardRst",
-                "-run"
+            "args": [
+                "--connect",
+                "port=swd",
+                "--download", "${command:cmake.launchTargetPath}",
+                "-hardRst"
             ],
             "options": {
-                "cwd": "${workspaceRoot}"
-            },
-            "group": {
-                "kind": "build"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": []
         }

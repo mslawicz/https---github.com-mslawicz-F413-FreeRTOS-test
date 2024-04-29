@@ -3,7 +3,6 @@
 
 osThreadId_t* pInjectTask = NULL;
 TIM_HandleTypeDef* pEncoderTIM = NULL;
-osTimerId_t* pMarkerLedTimerHandle = NULL;
 
 void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -18,7 +17,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         /* Marker pulse interrupt */
         pEncoderTIM->Instance->CNT = 0;     /* reset counter on MARKER pulse */
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-        osTimerStart(*pMarkerLedTimerHandle, 200);
+        osThreadFlagsSet(*pInjectTask, MARKER_EVENT);
     }
 }

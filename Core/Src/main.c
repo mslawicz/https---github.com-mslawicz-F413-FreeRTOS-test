@@ -139,7 +139,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   pInjectTask = &LedTriggerHandle;
   pEncoderTIM = &htim3;
-  pMarkerLedTimerHandle = &MarkerLedTimerHandle;
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_1);
@@ -627,74 +626,85 @@ void LedTriggerStart(void *argument)
   };
   uint8_t cylinder, lubricator;
   uint16_t currentPos, nextPos, firstPos, testPos;
+  uint32_t flags;
   /* Infinite loop */
   for(;;)
   {
     /* wait for flag from encoder interrupt */
-    osThreadFlagsWait(INJECT_EVENT, osFlagsWaitAny, osWaitForever);
-    currentPos = htim1.Instance->CCR1;
-    nextPos = 1024;
-    firstPos = 1024;
-    for(cylinder = 0; cylinder < NUMB_OF_CYLINDERS; cylinder++)
+    flags = osThreadFlagsWait(INJECT_EVENT | MARKER_EVENT, osFlagsWaitAny, osWaitForever);
+
+    if((flags & INJECT_EVENT) != 0)
     {
-      for(lubricator = 0; lubricator < 2; lubricator++)
+      currentPos = htim1.Instance->CCR1;
+      nextPos = 1024;
+      firstPos = 1024;
+      for(cylinder = 0; cylinder < NUMB_OF_CYLINDERS; cylinder++)
       {
-        testPos = trigPos[cylinder][lubricator][0];
-        if( currentPos == testPos)
+        for(lubricator = 0; lubricator < 2; lubricator++)
         {
-          /* start this lubricator */
-          if(lubricator == 0)
+          testPos = trigPos[cylinder][lubricator][0];
+          if( currentPos == testPos)
           {
-            HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+            /* start this lubricator */
+            if(lubricator == 0)
+            {
+              HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+            }
+            else
+            {
+              HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_SET);
+            }
+          }
+
+          if((testPos > currentPos) && (testPos < nextPos))
+          {
+            nextPos = testPos;
+          }
+          if((testPos < currentPos) && (testPos < firstPos))
+          {
+            firstPos = testPos;
+          }        
+
+          testPos = trigPos[cylinder][lubricator][1];
+          if( currentPos == testPos)
+          {
+            /* stop this lubricator */
+            if(lubricator == 0)
+            {
+              HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
+            }
+            else
+            {
+              HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_RESET);
+            }
+          }
+
+          if((testPos > currentPos) && (testPos < nextPos))
+          {
+            nextPos = testPos;
+          }
+          if((testPos < currentPos) && (testPos < firstPos))
+          {
+            firstPos = testPos;
+          }         
+
+          /* set next position to trig */
+          if(nextPos < 1024)
+          {
+            htim1.Instance->CCR1 = nextPos;
           }
           else
           {
-            HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_SET);
+            htim1.Instance->CCR1 = firstPos;
           }
-        }
-
-        if((testPos > currentPos) && (testPos < nextPos))
-        {
-          nextPos = testPos;
-        }
-        if((testPos < currentPos) && (testPos < firstPos))
-        {
-          firstPos = testPos;
-        }        
-
-        testPos = trigPos[cylinder][lubricator][1];
-        if( currentPos == testPos)
-        {
-          /* stop this lubricator */
-          if(lubricator == 0)
-          {
-            HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_RESET);
-          }
-          else
-          {
-            HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_RESET);
-          }
-        }
-
-        if((testPos > currentPos) && (testPos < nextPos))
-        {
-          nextPos = testPos;
-        }
-        if((testPos < currentPos) && (testPos < firstPos))
-        {
-          firstPos = testPos;
-        }         
-
-        /* set next position to trig */
-        if(nextPos < 1024)
-        {
-          htim1.Instance->CCR1 = nextPos;
-        }
-        else
-        {
-          htim1.Instance->CCR1 = firstPos;
         }
       }
+    }
+
+    if((flags & MARKER_EVENT) != 0)
+    {
+      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+      osTimerStart(MarkerLedTimerHandle, 100);
     }
   }
   /* USER CODE END LedTriggerStart */

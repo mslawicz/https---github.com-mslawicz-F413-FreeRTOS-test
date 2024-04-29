@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.12)
 set(TOOLCHAIN_NAME "gcc-arm-none-eabi")
 set(TARGET F413-cm-test)
 set(CMAKE_SYSTEM_NAME Generic)
@@ -51,14 +51,11 @@ add_link_options(
     -Wl,--no-warn-rwx-segment
 )
 
+file(GLOB PROJECT_SOURCE_FILES CONFIGURE_DEPENDS Core/Src/*.c)
+
 add_executable(
     ${TARGET}
-    Core/Src/main.c
-    Core/Src/freertos.c
-    Core/Src/stm32f4xx_it.c
-    Core/Src/stm32f4xx_hal_msp.c
-    Core/Src/stm32f4xx_hal_timebase_tim.c
-    Core/Src/my_timer.c
+    ${PROJECT_SOURCE_FILES}
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c

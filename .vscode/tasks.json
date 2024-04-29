@@ -31,7 +31,7 @@
             "problemMatcher": []
         },
         {
-            "label": "flash",
+            "label": "run",
             "type": "shell",
             "command": "STM32_Programmer_CLI",
             "args": 

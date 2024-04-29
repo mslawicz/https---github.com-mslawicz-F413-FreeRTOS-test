@@ -2,7 +2,7 @@
     "configurations": [
         {
             "cwd": "${workspaceRoot}",
-            "executable": "./cmake_build/F413-cm-test.elf",
+            "executable": "./build/F413-cm-test.elf",
             "name": "Debug with OpenOCD",
             "request": "launch",
             "type": "cortex-debug",

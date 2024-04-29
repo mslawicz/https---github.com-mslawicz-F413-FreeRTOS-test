@@ -71,6 +71,11 @@ const osThreadAttr_t LedToggle_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
+/* Definitions for MarkerLedTimer */
+osTimerId_t MarkerLedTimerHandle;
+const osTimerAttr_t MarkerLedTimer_attributes = {
+  .name = "MarkerLedTimer"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -86,6 +91,7 @@ static void MX_TIM1_Init(void);
 void StartDefaultTask(void *argument);
 void LedTriggerStart(void *argument);
 void LedToggleStart(void *argument);
+void MarkerLedCbk(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -102,6 +108,7 @@ void LedToggleStart(void *argument);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -132,6 +139,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   pInjectTask = &LedTriggerHandle;
   pEncoderTIM = &htim3;
+  pMarkerLedTimerHandle = &MarkerLedTimerHandle;
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_1);
@@ -147,6 +155,10 @@ int main(void)
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
+
+  /* Create the timer(s) */
+  /* creation of MarkerLedTimer */
+  MarkerLedTimerHandle = osTimerNew(MarkerLedCbk, osTimerOnce, NULL, &MarkerLedTimer_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
@@ -179,6 +191,7 @@ int main(void)
   osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -703,6 +716,14 @@ void LedToggleStart(void *argument)
     osDelay(2000);
   }
   /* USER CODE END LedToggleStart */
+}
+
+/* MarkerLedCbk function */
+void MarkerLedCbk(void *argument)
+{
+  /* USER CODE BEGIN MarkerLedCbk */
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  /* USER CODE END MarkerLedCbk */
 }
 
 /**

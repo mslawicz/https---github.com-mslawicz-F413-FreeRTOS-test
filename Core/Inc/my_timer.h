@@ -8,5 +8,6 @@
 
 extern osThreadId_t* pInjectTask;
 extern TIM_HandleTypeDef* pEncoderTIM;
+extern osTimerId_t* pMarkerLedTimerHandle;
 
 #endif /* __MY_TIMER_H */

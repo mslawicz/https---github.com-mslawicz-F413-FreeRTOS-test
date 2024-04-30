@@ -39,7 +39,7 @@ set(LINKER_SCRIPT "${PROJ_PATH}/STM32F413ZHTx_FLASH.ld")
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
-SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 
 # symbol definitions
 add_compile_definitions(

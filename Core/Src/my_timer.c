@@ -13,7 +13,7 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if(GPIO_Pin == Marker_Int_Pin)
+    if(0)
     {
         /* Marker pulse interrupt */
         pEncoderTIM->Instance->CNT = 0;     /* reset counter on MARKER pulse */

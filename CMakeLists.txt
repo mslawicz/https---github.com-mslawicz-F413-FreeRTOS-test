@@ -1,22 +1,33 @@
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+# default GCC settings
+set(TOOLCHAIN_PREFIX arm-none-eabi)
+set(C_FLAGS "-fdata-sections -ffunction-sections -specs=nano.specs -Wl,--gc-sections")
+set(CPP_FLAGS "-fno-rtti -fno-exceptions -fno-threadsafe-statics")
+
+# compiler settings
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc ${C_FLAGS})
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}-gcc ${C_FLAGS})
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++ ${C_FLAGS} ${CPP_FLAGS})
+set(OBJCOPY ${TOOLCHAIN_PREFIX}-objcopy)
+set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}-size)
+
+set(CMAKE_EXECUTABLE_SUFFIX_C ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_ASM ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_CXX ".elf")
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
 cmake_minimum_required(VERSION 3.12)
 set(TOOLCHAIN_NAME "gcc-arm-none-eabi")
 set(TARGET F413-cm-test)
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_EXECUTABLE_SUFFIX_C .elf)
-set(CMAKE_SYSTEM_PROCESSOR arm)
-set(TRIPLET arm-none-eabi)
-set(CMAKE_C_COMPILER ${TRIPLET}-gcc)
-set(CMAKE_ASM_COMPILER ${TRIPLET}-gcc)
-set(CMAKE_CXX_COMPILER ${TRIPLET}-g++)
-set(OBJCOPY ${TRIPLET}-objcopy)
-set(CMAKE_SIZE ${TRIPLET}-size)
-set(CMAKE_C_FLAGS_INIT "-fdata-sections -ffunction-sections -specs=nano.specs -Wl,--gc-sections")
+set(TOOLCHAIN_PREFIX arm-none-eabi)
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
 SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 set(CMAKE_GENERATOR "MinGW Makefiles")
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(LDSCRIPT "../STM32F413ZHTx_FLASH.ld")
 
 enable_language(C ASM)
@@ -43,7 +54,6 @@ add_compile_definitions(
 
 add_link_options(
     -T${LDSCRIPT}
-    -specs=nano.specs
     -lc 
     -lm 
     -Wl,-Map=${TARGET}.map,--cref

@@ -32,36 +32,26 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 project(F413-cm-test)
 enable_language(C ASM)
 
-# Core MCU flags, CPU, instruction set and FPU setup
-# Needs to be set properly for your MCU
-set(CPU_PARAMETERS
-    -mthumb
-    -mcpu=cortex-m4
-    -mfloat-abi=hard
-    -mfpu=fpv4-sp-d16
-)    
-
+# linker script
 set(LINKER_SCRIPT "../STM32F413ZHTx_FLASH.ld")
 
-
-
-
-#set(TOOLCHAIN_NAME "gcc-arm-none-eabi")
+# compiler options
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
 SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
-set(CMAKE_GENERATOR "MinGW Makefiles")
+set(CMAKE_GENERATOR Ninja)
 
-
+# symbol definitions
 add_compile_definitions(
     STM32F413xx
     USE_HAL_DRIVER
     _DEBUG
     UNICODE
-    _UNICODE    
+    _UNICODE
 )
 
+# linker options
 add_link_options(
     -T${LINKER_SCRIPT}
     -lc 
@@ -72,6 +62,7 @@ add_link_options(
     -Wl,--print-memory-usage
 )
 
+# project source files
 file(GLOB PROJECT_SOURCE_FILES CONFIGURE_DEPENDS Core/Src/*.c)
 
 add_executable(
@@ -107,7 +98,7 @@ add_executable(
     Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
     Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
 )
-
+# include directories
 include_directories(
     Core/Inc
     Drivers/STM32F4xx_HAL_Driver/Inc
@@ -119,6 +110,7 @@ include_directories(
     Drivers/CMSIS/Include
 )
 
+# compile and link libraries
 add_library(
     CMSIS
     Core/Src/system_stm32f4xx.c
@@ -140,6 +132,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
 )
 
+# save hex and bin files
 set(HEX "${OBJCOPY} -O ihex")
 set(BIN "${OBJCOPY} -O binary -S")
 

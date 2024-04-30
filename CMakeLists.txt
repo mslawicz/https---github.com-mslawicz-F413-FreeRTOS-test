@@ -20,29 +20,39 @@ set(CMAKE_EXECUTABLE_SUFFIX_CXX ".elf")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 cmake_minimum_required(VERSION 3.12)
-set(TOOLCHAIN_NAME "gcc-arm-none-eabi")
-set(TARGET F413-cm-test)
-set(TOOLCHAIN_PREFIX arm-none-eabi)
+
+# compiler settings
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+set(PROJ_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
+# core project settings
+project(F413-cm-test)
+enable_language(C ASM)
+
+# Core MCU flags, CPU, instruction set and FPU setup
+# Needs to be set properly for your MCU
+set(CPU_PARAMETERS
+    -mthumb
+    -mcpu=cortex-m4
+    -mfloat-abi=hard
+    -mfpu=fpv4-sp-d16
+)    
+
+set(LINKER_SCRIPT "../STM32F413ZHTx_FLASH.ld")
+
+
+
+
+#set(TOOLCHAIN_NAME "gcc-arm-none-eabi")
 set(CFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -fdata-sections -ffunction-sections -g -gdwarf-2")
 set(CMAKE_C_FLAGS ${CFLAGS})
 set(CMAKE_CXX_FLAGS "${CFLAGS} -Og")
 SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 set(CMAKE_GENERATOR "MinGW Makefiles")
-set(LDSCRIPT "../STM32F413ZHTx_FLASH.ld")
 
-enable_language(C ASM)
-
-project(
-    ${TARGET}
-    VERSION 1.0
-)
-
-add_compile_options(
-    -mthumb
-    -mcpu=cortex-m4
-    -mfloat-abi=hard
-    -mfpu=fpv4-sp-d16
-)
 
 add_compile_definitions(
     STM32F413xx
@@ -53,10 +63,10 @@ add_compile_definitions(
 )
 
 add_link_options(
-    -T${LDSCRIPT}
+    -T${LINKER_SCRIPT}
     -lc 
     -lm 
-    -Wl,-Map=${TARGET}.map,--cref
+    -Wl,-Map=${CMAKE_PROJECT_NAME}.map,--cref
     -Wl,--gc-sections
     -Wl,--no-warn-rwx-segment
     -Wl,--print-memory-usage
@@ -65,7 +75,7 @@ add_link_options(
 file(GLOB PROJECT_SOURCE_FILES CONFIGURE_DEPENDS Core/Src/*.c)
 
 add_executable(
-    ${TARGET}
+    ${CMAKE_PROJECT_NAME}
     ${PROJECT_SOURCE_FILES}
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
     Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
@@ -120,21 +130,21 @@ add_library(
 )
 
 target_link_libraries(
-    ${TARGET}
+    ${CMAKE_PROJECT_NAME}
     CMSIS
     STARTUP
 )
 
 # Execute post-build to print size
-add_custom_command(TARGET ${TARGET} POST_BUILD
-    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${TARGET}>
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
 )
 
 set(HEX "${OBJCOPY} -O ihex")
 set(BIN "${OBJCOPY} -O binary -S")
 
 add_custom_command(
-    TARGET ${TARGET} POST_BUILD
-    COMMAND ${OBJCOPY} ARGS -O ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
-    COMMAND ${OBJCOPY} ARGS -O binary -S $<TARGET_FILE:${TARGET}> ${TARGET}.bin
+    TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${OBJCOPY} ARGS -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.hex
+    COMMAND ${OBJCOPY} ARGS -O binary -S $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.bin
 )

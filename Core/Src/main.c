@@ -70,6 +70,18 @@ const osThreadAttr_t LedToggle_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal5,
 };
+/* Definitions for USB_rcv */
+osThreadId_t USB_rcvHandle;
+const osThreadAttr_t USB_rcv_attributes = {
+  .name = "USB_rcv",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
+/* Definitions for USB_rcvQueue */
+osMessageQueueId_t USB_rcvQueueHandle;
+const osMessageQueueAttr_t USB_rcvQueue_attributes = {
+  .name = "USB_rcvQueue"
+};
 /* Definitions for MarkerLedTimer */
 osTimerId_t MarkerLedTimerHandle;
 const osTimerAttr_t MarkerLedTimer_attributes = {
@@ -89,6 +101,7 @@ static void MX_TIM1_Init(void);
 void StartDefaultTask(void *argument);
 void LedTriggerStart(void *argument);
 void LedToggleStart(void *argument);
+void USB_rcvStart(void *argument);
 void MarkerLedCbk(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -160,6 +173,10 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of USB_rcvQueue */
+  USB_rcvQueueHandle = osMessageQueueNew (4, 8, &USB_rcvQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -173,6 +190,9 @@ int main(void)
 
   /* creation of LedToggle */
   LedToggleHandle = osThreadNew(LedToggleStart, NULL, &LedToggle_attributes);
+
+  /* creation of USB_rcv */
+  USB_rcvHandle = osThreadNew(USB_rcvStart, NULL, &USB_rcv_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -689,6 +709,24 @@ void LedToggleStart(void *argument)
     osDelay(2000);
   }
   /* USER CODE END LedToggleStart */
+}
+
+/* USER CODE BEGIN Header_USB_rcvStart */
+/**
+* @brief Function implementing the USB_rcv thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_USB_rcvStart */
+void USB_rcvStart(void *argument)
+{
+  /* USER CODE BEGIN USB_rcvStart */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END USB_rcvStart */
 }
 
 /* MarkerLedCbk function */

@@ -96,6 +96,14 @@ add_executable(
     Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c
     Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
     Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
+    USB_DEVICE/App/usb_device.c
+    USB_DEVICE/App/usbd_desc.c
+    USB_DEVICE/App/usbd_cdc_if.c
+    USB_DEVICE/Target/usbd_conf.c
+    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c
+    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c
+    Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c
+    Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
 )
 # include directories
 include_directories(
@@ -107,6 +115,10 @@ include_directories(
     Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     Drivers/CMSIS/Device/ST/STM32F4xx/Include
     Drivers/CMSIS/Include
+    USB_DEVICE/App
+    USB_DEVICE/Target
+    Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+    Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc    
 )
 
 # compile and link libraries

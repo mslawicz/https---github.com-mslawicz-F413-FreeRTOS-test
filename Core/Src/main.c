@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "cmsis_os2.h"
 #include "my_timer.h"
+#include "USB_rcv.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -721,11 +722,7 @@ void LedToggleStart(void *argument)
 void USB_rcvStart(void *argument)
 {
   /* USER CODE BEGIN USB_rcvStart */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+  USB_rcvTask();
   /* USER CODE END USB_rcvStart */
 }
 

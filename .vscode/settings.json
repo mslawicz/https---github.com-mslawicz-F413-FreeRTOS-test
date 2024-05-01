@@ -4,6 +4,7 @@
         "main.h": "c",
         "stm32f4xx.h": "c",
         "my_timer.h": "c",
-        "cmsis_os2.h": "c"
+        "cmsis_os2.h": "c",
+        "usb_rcv.h": "c"
     }
 }

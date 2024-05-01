@@ -180,6 +180,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+  pUSB_rcvQueueHandle = &USB_rcvQueueHandle;
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */

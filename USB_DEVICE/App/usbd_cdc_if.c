@@ -22,7 +22,8 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "USB_rcv.h"
+#include "cmsis_os2.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +33,7 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 uint8_t USB_ctrl_buf[USB_CTRL_BUF_SIZE];
+static struct USB_rcv_t USB_rcv_buf;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -263,6 +265,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  USB_rcv_buf.pBuffer = Buf;
+  USB_rcv_buf.pLength = Len;
+  osMessageQueuePut(*pUSB_rcvQueueHandle, &USB_rcv_buf, 0, 0);
   return (USBD_OK);
   /* USER CODE END 6 */
 }

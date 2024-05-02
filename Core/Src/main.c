@@ -26,6 +26,7 @@
 #include "cmsis_os2.h"
 #include "my_timer.h"
 #include "USB_rcv.h"
+#include "logger.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -581,6 +582,7 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
+  LOG("ALCU v2");
   /* Infinite loop */
   for(;;)
   {

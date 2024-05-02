@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 
 # default GCC settings
 set(TOOLCHAIN_PREFIX arm-none-eabi)
-set(C_FLAGS "-fdata-sections -ffunction-sections -specs=nano.specs -Wl,--gc-sections")
+set(C_FLAGS "-fdata-sections -ffunction-sections -specs=nano.specs -specs=nosys.specs -Wl,--gc-sections")
 set(CPP_FLAGS "-fno-rtti -fno-exceptions -fno-threadsafe-statics")
 
 # compiler settings
@@ -53,6 +53,7 @@ add_compile_definitions(
 # linker options
 add_link_options(
     -T${LINKER_SCRIPT}
+    -specs=nosys.specs
     -lc 
     -lm 
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map,--cref

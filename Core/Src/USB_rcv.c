@@ -16,7 +16,7 @@ void USB_rcvTask(void)
     CDC_Transmit_FS(USB_rcv_buf.pBuffer, *(USB_rcv_buf.pLength));
     if(USB_rcv_buf.pBuffer[0] == 'h')
     {
-      LOG("\r\nHello, this is ALCU ver. %d\n", 1);
+      logMessage(LVL_INFO, "\r\nHello, this is ALCU ver. %d\n", 1);
     }
   }    
 }

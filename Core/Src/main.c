@@ -585,7 +585,6 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
-  LOG("ALCU v2");
   /* Infinite loop */
   for(;;)
   {
@@ -639,11 +638,12 @@ void LedTriggerStart(void *argument)
             if(lubricator == 0)
             {
               HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
-              LOG("lubricator 1 start of injection");
+              logMessage(LVL_INFO, "start of lubricator %d", lubricator + 1);
             }
             else
             {
               HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_SET);
+              logMessage(LVL_INFO, "start of lubricator %d", lubricator + 1);
             }
           }
 

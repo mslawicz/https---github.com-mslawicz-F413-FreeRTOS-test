@@ -4,15 +4,16 @@
 #include "stdio.h"
 #include "usbd_cdc_if.h"
 
-#define PRINT_BUF_LENGTH    80
+enum LogLevel_t
+{
+    LVL_NONE,
+    LVL_ERROR,
+    LVL_WARNING,
+    LVL_INFO,
+    LVL_DEBUG,
+    LVL_ALL
+};
 
-extern char printBuf[PRINT_BUF_LENGTH];
-
-void logMessage(void);
-
-#define LOG(...) {\
-    snprintf(printBuf, PRINT_BUF_LENGTH, __VA_ARGS__);\
-    logMessage();\
-}
+void logMessage(enum LogLevel_t level, const char* msg, ...);
 
 #endif /* __LOGGER_H */

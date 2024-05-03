@@ -6,12 +6,12 @@
 
 enum LogLevel_t
 {
-    LVL_NONE,
-    LVL_ERROR,
-    LVL_WARNING,
-    LVL_INFO,
     LVL_DEBUG,
-    LVL_ALL
+    LVL_INFO,
+    LVL_WARNING,
+    LVL_ERROR,
+    LVL_NONE,
+    LVL_ALWAYS
 };
 
 void logMessage(enum LogLevel_t level, const char* msg, ...);

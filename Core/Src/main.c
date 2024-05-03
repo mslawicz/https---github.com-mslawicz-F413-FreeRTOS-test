@@ -638,12 +638,10 @@ void LedTriggerStart(void *argument)
             if(lubricator == 0)
             {
               HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
-              logMessage(LVL_INFO, "start of lubricator %d", lubricator + 1);
             }
             else
             {
               HAL_GPIO_WritePin(TEST3_GPIO_Port, TEST3_Pin, GPIO_PIN_SET);
-              logMessage(LVL_INFO, "start of lubricator %d", lubricator + 1);
             }
           }
 
@@ -696,6 +694,9 @@ void LedTriggerStart(void *argument)
     {
       HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
       osTimerStart(MarkerLedTimerHandle, 100);
+      logMessage(LVL_INFO, "shaft marker triggered");
+      logMessage(LVL_WARNING, "shaft marker triggered");
+      logMessage(LVL_ERROR, "shaft marker triggered");
     }
   }
   /* USER CODE END LedTriggerStart */

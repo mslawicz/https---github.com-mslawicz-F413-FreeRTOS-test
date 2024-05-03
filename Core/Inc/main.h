@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define TEST2_GPIO_Port GPIOC
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
+#define TEST4_Pin GPIO_PIN_2
+#define TEST4_GPIO_Port GPIOB
 #define Marker_Int_Pin GPIO_PIN_9
 #define Marker_Int_GPIO_Port GPIOE
 #define Marker_Int_EXTI_IRQn EXTI9_5_IRQn

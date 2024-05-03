@@ -639,6 +639,7 @@ void LedTriggerStart(void *argument)
             if(lubricator == 0)
             {
               HAL_GPIO_WritePin(TEST2_GPIO_Port, TEST2_Pin, GPIO_PIN_SET);
+              LOG("lubricator 1 start of injection");
             }
             else
             {

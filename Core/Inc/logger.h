@@ -8,9 +8,11 @@
 
 extern char printBuf[PRINT_BUF_LENGTH];
 
+void logMessage(void);
+
 #define LOG(...) {\
     snprintf(printBuf, PRINT_BUF_LENGTH, __VA_ARGS__);\
-    CDC_Transmit_FS((uint8_t*)printBuf, strlen(printBuf));\
+    logMessage();\
 }
 
 #endif /* __LOGGER_H */

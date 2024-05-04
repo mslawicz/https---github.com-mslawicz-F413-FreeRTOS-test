@@ -3,6 +3,9 @@
 
 #include "stdio.h"
 #include "usbd_cdc_if.h"
+#include "cmsis_os2.h"
+
+extern osMutexId_t* pLoggerMutexHandle;
 
 enum LogLevel_t
 {

@@ -5,6 +5,7 @@
 
 char printBuf[PRINT_BUF_LENGTH];
 enum LogLevel_t currentLogLevel = LVL_ERROR;
+osMutexId_t* pLoggerMutexHandle = NULL;
 
 void _close(void)
 {
@@ -50,7 +51,8 @@ void logMessage(enum LogLevel_t level, const char* msg, ...)
             pText = "*";
             break;                        
         }
-        
+        /* aquire logger mutex */
+        osMutexAcquire(*pLoggerMutexHandle, osWaitForever);
         /* place level severity text */
         strcpy(printBuf, pText);
         size_t len = strlen(pText);
@@ -69,6 +71,8 @@ void logMessage(enum LogLevel_t level, const char* msg, ...)
         len += strlen(pText);
         /* transmit the string over USB link */
         CDC_Transmit_FS((uint8_t*)printBuf, len);
+        /* release logger mutex */
+        osMutexRelease(*pLoggerMutexHandle);
         HAL_GPIO_WritePin(TEST4_GPIO_Port, TEST4_Pin, GPIO_PIN_RESET);
     }
 }

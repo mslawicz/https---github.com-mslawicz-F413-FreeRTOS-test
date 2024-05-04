@@ -89,6 +89,11 @@ osTimerId_t MarkerLedTimerHandle;
 const osTimerAttr_t MarkerLedTimer_attributes = {
   .name = "MarkerLedTimer"
 };
+/* Definitions for loggerMutex */
+osMutexId_t loggerMutexHandle;
+const osMutexAttr_t loggerMutex_attributes = {
+  .name = "loggerMutex"
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -158,9 +163,13 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
+  /* Create the mutex(es) */
+  /* creation of loggerMutex */
+  loggerMutexHandle = osMutexNew(&loggerMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
+  pLoggerMutexHandle = &loggerMutexHandle;
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */

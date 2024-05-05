@@ -51,11 +51,24 @@ void logMessage(enum LogLevel_t level, const char* msg, ...)
             pText = "*";
             break;                        
         }
+        /* calculate timestamp components */
+        uint32_t ticks = HAL_GetTick();
+        uint8_t ms = ticks % 1000;
+        ticks /= 1000;
+        uint8_t sec = ticks % 60;
+        ticks /= 60;
+        uint8_t min = ticks % 60;
+        ticks /= 60;
+        uint8_t hour = ticks % 24;
+        ticks /= 24;                
         /* aquire logger mutex */
         osMutexAcquire(*pLoggerMutexHandle, osWaitForever);
+        /* place timestamp in the buffer */
+        sprintf(printBuf, "[%lu:%d:%02d:%02d:%03d]", ticks, hour, min, sec, ms);
+        size_t len = strlen(printBuf);
         /* place level severity text */
-        strcpy(printBuf, pText);
-        size_t len = strlen(pText);
+        strcpy(printBuf + len, pText);
+        len += strlen(pText);
         printBuf[len++] = ':';
         /* terminating string */
         pText = "\n\r";
